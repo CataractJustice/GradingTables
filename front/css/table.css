@@ -1,0 +1,22 @@
+
+table {
+	border-spacing: 0px;
+}
+
+th {
+	padding: 12px;
+	border: solid 1px;
+	min-width: 42px;
+}
+
+.GradeCell {
+
+}
+
+.GradeCellEvaluated {
+
+}
+
+.GradeCellNotEvaluated {
+	text-decoration: line-through;
+}
