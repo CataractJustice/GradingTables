@@ -13,5 +13,9 @@ global.config = {
 				}
 			}
 		}
+	},
+
+	DB: {
+		url: "mongodb://localhost:2103/db"
 	}
 }

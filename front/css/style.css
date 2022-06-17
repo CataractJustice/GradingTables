@@ -1,43 +1,100 @@
 * {
 	margin: 0;
 	padding: 0;
+	font-family: sans-serif;
 }
 
-.SideMenu {
-	position: fixed;
-	width: 320px;
-	height: 100%;
-	border-right-width: 2px;
-	border-right-style: solid;
-	border-right-color: #a0a0a0;
-}
-
-/*
-.SideMenu {
-	left: -256px;
-}
-.SideMenu:hover {
-	left: 0;
-}
-*/
-.SideMenuHeader {
-	position: relative;
+.Menu {
 	width: 100%;
+	background-color: #f0f0f0;
+	font-size: 24px;
+}
+
+.MenuLink {
 	height: 64px;
-	background-color: #a0a0a0;
+	line-height: 64px;
+	display: inline-block;
+	padding-right: 16px;
+	padding-left: 16px;
+	background-color: #f8f8f8;
 }
 
-.Content {
-	min-height: 100%;
-	width: 60%;
-	margin-left: 20%;
-
-	border-right-width: 2px;
-	border-right-style: solid;
-	border-right-color: #a0a0a0;
-
-	border-left-width: 2px;
-	border-left-style: solid;
-	border-left-color: #a0a0a0;
+.MenuLink:hover {
+	background-color: #e8e8e8;
 }
 
+.MenuLink:active {
+	background-color: #e0e0e0;
+}
+
+.TeamList {
+	font-size: 18px;
+	display: grid;
+	grid-template-columns: auto auto auto auto;
+	column-gap: 4px;
+	row-gap: 4px;
+}
+
+.TableList {
+	font-size: 18px;
+	display: grid;
+	grid-template-columns: auto auto auto;
+	column-gap: 4px;
+	row-gap: 4px;
+}
+
+.GradeList {
+	font-size: 18px;
+	display: grid;
+	grid-template-columns: auto auto auto auto;
+	column-gap: 4px;
+	row-gap: 4px;
+}
+
+.FieldGrade {
+	padding: 0px;
+}
+
+.FieldGradeCheckbox {
+	width: 32px;
+	height: 32px;
+}
+
+.FieldControlls {
+	display: grid;
+	grid-template-columns: auto auto;
+	column-gap: 4px;
+	row-gap: 4px;
+}
+
+.FieldMoveControlls {
+    width: 100%;
+}
+
+button {
+	font-size: 18px;
+	border: none;
+	margin: 1px;
+	border-radius: 4px;
+	padding: 4px;
+}
+
+details {
+	background-color: #e8e8e8;
+	border-radius: 4px;
+	border-color: #e0e0e0;
+	border-width: 2px;
+	border-style: solid;
+	padding: 4px;
+}
+
+.Header {
+	margin-top: 16px;
+	background-color: #e8e8e8;
+	border-radius: 4px;
+	border-color: #e0e0e0;
+	border-width: 2px;
+	border-style: solid;
+	padding: 4px;
+	font-weight: bold;
+}

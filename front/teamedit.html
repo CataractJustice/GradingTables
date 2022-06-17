@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<link rel="stylesheet" href="css/style.css">
+	</head>
+	<body>
+	
+	<div class="Menu">
+		<a href="/login.html"><div class="MenuLink">Login</div></a>
+		<a href="/tables.html"><div class="MenuLink">Tables</div></a>
+		<a href="/teams.html"><div class="MenuLink">Teams</div></a>
+	</div>
+
+	<div class="Content">
+		<span>Team members:</span>
+		<div class="TeamMembersList"></div>
+		<button onclick="addMember()">+</button><button onclick="popMember()">-</button>
+		<button onclick="post('/teamupdate', {id: args.id, members: members})">Save members</button>
+	</div>
+	<script src="js/Post.js"></script>
+	<script src="js/Params.js"></script>
+	<script>
+		let args = getJsonFromUrl();
+		let members = [];
+		let poppedMembers = [];
+		let membersListContainer = document.getElementsByClassName("TeamMembersList")[0];
+
+		function addMember(name) {
+			let pop = poppedMembers.pop();
+			name = name ? name : pop ? pop : "";
+			let index = members.length;
+			members.push(name);
+			let memberListInstance = document.createElement("div");
+			let memberInput = document.createElement("input");
+			memberInput.type = "text";
+			memberInput.value = name;
+			memberInput.onchange = function() {
+				members[index] = this.value;
+			};
+			memberListInstance.className = "MemberListInstance";
+			memberListInstance.append(memberInput);
+			membersListContainer.append(memberListInstance);
+		}
+
+		function popMember() {
+			if(!members.length) return;
+			let memberDomInstances = document.getElementsByClassName("MemberListInstance");
+			memberDomInstances[memberDomInstances.length - 1].remove();
+			poppedMembers.push(members.pop());
+		}
+
+		post("/teamread", {id: args.id}, function(team) {
+			for(let member of team.members) {
+				addMember(member);
+			}
+		});
+	</script>
+	</body>
+</html>

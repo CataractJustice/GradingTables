@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<link rel="stylesheet" href="css/style.css">
+	</head>
+	<body>
+	<div class="Menu">
+		<a href="/login.html"><div class="MenuLink">Login</div></a>
+		<a href="/tables.html"><div class="MenuLink">Tables</div></a>
+		<a href="/teams.html"><div class="MenuLink">Teams</div></a>
+	</div>
+		<div class="TableList">
+		
+		</div>
+		<form action="/tablecreate", method="POST">
+			<span>Table title</span>
+			<input name="title" class="TableTitleInput"/>
+			<input type="submit" value="Create">
+		</form>
+	</body>
+
+	<script src="js/TableField.js"></script>
+	<script src="js/Table.js"></script>
+	<script src="js/TableList.js"></script>
+</html>

@@ -11,25 +11,16 @@
 		<a href="/tables.html"><div class="MenuLink">Tables</div></a>
 		<a href="/teams.html"><div class="MenuLink">Teams</div></a>
 	</div>
-		<form action="/tableupdate", method="POST">
-			<input name="table" class="HiddenTableInput" style="display:none;"/>
-			<input type="submit" 
-			onsubmit="function(e){e.returnValue = gtable.weightSum <= 10; return gtable.weightSum <= 10;}"
-			onclick="
-			if(gtable.weightSum > 10) {
-				alert('Make sure that max grade is not greater than 10');
-				return flase;
-			}
-			gtable.saved = true;
-			delete window.onbeforeunload;
-			let tableInput = document.getElementsByClassName('HiddenTableInput')[0];
-			tableInput.value = JSON.stringify({
-				id: gtable.id,
+		<button onclick="post('/gradeupdate', {
+				tableID: gtable.id,
+				teamID: urlParams.teamID,
 				fields: gtable.fields
-			});
-			" value="Save table">
-		</form>
+			}, function(grade) {
+				if(!urlParams.id) window.location.search += `&id=${grade.id}`;
+				gtable.saved = true;
+			})" >Save grade</button>
 	</body>
+	<script src="js/Post.js"></script>
 	<script src="js/TableField.js"></script>
 	<script src="js/Table.js"></script>
 	<script>
@@ -46,9 +37,20 @@
 
 		let urlParams = getJsonFromUrl();
 		let gtable;
-		Table.load(urlParams.id, function(table) {
+		Table.load(urlParams.tableID, function(table) {
+			table.updateDOM(true);
 			document.body.appendChild(table.DOM);
 			gtable = table;
+		});
+
+		post("graderead", {id: urlParams.id}, function(grade) {
+			for(let field of grade.grades) {
+				gtable.fields.find(function(f) {
+					return f.id == field.id;
+				}).grade = field.grade;
+			}
+			gtable.updateDOM(true);
+			gtable.updateGrade();
 		});
 
 		window.onbeforeunload = function(){

@@ -5,11 +5,22 @@
 		<link rel="stylesheet" href="css/style.css">
 	</head>
 	<body>
-	
 	<div class="Menu">
 		<a href="/login.html"><div class="MenuLink">Login</div></a>
 		<a href="/tables.html"><div class="MenuLink">Tables</div></a>
 		<a href="/teams.html"><div class="MenuLink">Teams</div></a>
 	</div>
+		<div class="TeamList">
+		
+		</div>
+		<form action="/teamcreate", method="POST">
+			<span>Team title</span>
+			<input name="title" class="TableTitleInput"/>
+			<input type="submit" value="Create">
+		</form>
 	</body>
+
+	<script src="js/Post.js"></script>
+	<script src="js/Team.js"></script>
+	<script src="js/TeamList.js"></script>
 </html>

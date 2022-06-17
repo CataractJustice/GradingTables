@@ -5,16 +5,9 @@ table {
 
 th {
 	padding: 12px;
-	border: solid 1px;
+	border: solid 0.5px;
+	border-color: gray;
 	min-width: 42px;
-}
-
-.GradeCell {
-
-}
-
-.GradeCellEvaluated {
-
 }
 
 .GradeCellNotEvaluated {

@@ -5,6 +5,7 @@ class Table {
 	//public
 	title;
 	fields;
+	saved;
 
 	#author;
 	#id;
@@ -32,20 +33,38 @@ class Table {
 		return true;
 	}
 
+	setFieldGradeById(id, grade) {
+		this.fields.find(function(field) {return field.id == id}).grade = grade;
+	}
+
 	insertField(field, index) {
 		field.table = this;
-		if(!index)
+		if(index < 0) index = 0; 
+		if(index === undefined)
 			index = this.fields.length;
 		index = Math.min(this.fields.length, index);
 		
 		if(index == this.fields.length) {
 			this.fields.push(field);
+			field.index = index;
 			return;
 		}
 
 		let buffer = this.fields[index];
 		this.fields[index] = field;
-		this.insertField(field, index + 1);
+		this.insertField(buffer, index + 1);
+
+		for(let i = 0; i < this.fields.length; i++) {
+			this.fields[i].index = i;
+		}
+	}
+
+	removeField(index) {
+		while(this.fields[index] = this.fields[++index]);
+		this.fields.pop();
+		for(let i = 0; i < this.fields.length; i++) {
+			this.fields[i].index = i;
+		}
 	}
 
 	get id() {
@@ -56,10 +75,16 @@ class Table {
 		return this.#author;
 	}
 	
-	constructor(title, author) {
+	constructor(title, author, id, fields) {
 		this.title = title;
 		this.#author = author;
+		this.#id = id;
 		this.fields = [];
+		if(fields) {
+			for(let field of fields)
+				this.insertField(new TableField(field.title, field.weight, field.maxGrade, field.minAcceptable, field.id));
+		}
+		this.saved = true;
 	}
 
 	updateGrade() {
@@ -68,12 +93,17 @@ class Table {
 
 		sumCell.innerText = this.weightSum;
 		
-		gradeCell.innerText = this.grade;
+		gradeCell.innerText = Math.round(this.grade * 100) / 100;
+		let g = this.grade / this.weightSum;
+		gradeCell.style.backgroundColor = `rgb(${parseInt(Math.min(512-g*512, 255))}, ${parseInt(Math.min(g*512, 255))}, 0)`;
 		gradeCell.classList.add(this.acceptable ? "GradeCellEvaluated" : "GradeCellNotEvaluated");
 		gradeCell.classList.remove(this.acceptable ? "GradeCellNotEvaluated" : "GradeCellEvaluated");
+		this.saved = false;
 	}
 
-	#updateDOM () {
+	updateDOM (gradeEdit) {
+		let tableEdit = !gradeEdit;
+
 		//create table
 		let table = this.#DOM;
 		if(!table)
@@ -83,61 +113,76 @@ class Table {
 
 		//create header row
 		let header = document.createElement("tr");
-
-		//column titles
-
 		let titleheader = document.createElement("th");
-		titleheader.innerText = "Requirement";
-		header.appendChild(titleheader);
-
 		let weightheader = document.createElement("th");
-		weightheader.innerText = "If it meets";
-		header.appendChild(weightheader);
-
 		let acceptanceheader = document.createElement("th");
-		acceptanceheader.innerText = "If not";
-		header.appendChild(acceptanceheader);
-
 		let gradeheader = document.createElement("th");
-		gradeheader.innerText = "Result";
-		header.appendChild(gradeheader);
-		
-		//
-		table.appendChild(header);
 
-		//append requirements rows to a table
-		for(let field of this.fields) {
-			table.appendChild(field.createDOM());
-		}
-		
+		titleheader.innerText = "Requirement";
+		weightheader.innerText = "If it meets";
+		acceptanceheader.innerText = "If not";
+		if(tableEdit) gradeheader.innerText = "Grade range";
+		if(gradeEdit) gradeheader.innerText = "Result";
+
 		//create grading result
 		let gradingrow = document.createElement("tr");
-		
 		let sumTitle = document.createElement("th");
-		sumTitle.className = "SumTitle";
-		sumTitle.innerText = "Suma:";
-		gradingrow.appendChild(sumTitle);
-
 		let sumCell = document.createElement("th");
+		let emptyCell = document.createElement("th");
+		let gradeCell = document.createElement("th");
+		
+		sumTitle.className = "SumTitle";
+		sumTitle.innerText = "Sum:";
 		sumCell.className = "WeightSumCell";
 		sumCell.innerText = " ";
-		gradingrow.appendChild(sumCell);
-
-		let emptyCell = document.createElement("th");
-		gradingrow.appendChild(emptyCell);
-
-		let gradeCell = document.createElement("th");
 		gradeCell.className = "GradeCell";
 		gradeCell.innerText = " ";
-		gradingrow.appendChild(gradeCell);
+		
+		//append columns to a table header
+		header.appendChild(titleheader);
+		header.appendChild(weightheader);
+		header.appendChild(acceptanceheader);
+		header.appendChild(gradeheader);
+		//append a table header
+		table.appendChild(header);
+		
+		//append requirement rows to a table
 
+		for(let field of this.fields) {
+			table.appendChild(field.createDOM(gradeEdit));
+		}
+
+		if(tableEdit) {
+			let editRow = document.createElement("tr");
+			let editCell = document.createElement("th");
+
+			let newFieldButton = document.createElement("button");
+			let tableobj = this;
+			newFieldButton.innerText = "New requirement";
+			newFieldButton.onclick =  function() {
+				tableobj.insertField(new TableField("", 1, 1, 0));
+				tableobj.updateDOM();
+				tableobj.updateGrade();
+			}
+			editCell.appendChild(newFieldButton);
+			editRow.appendChild(editCell);
+
+			table.appendChild(editRow);
+		}
+
+		//append grading row
+		gradingrow.appendChild(sumTitle);
+		gradingrow.appendChild(sumCell);
+		gradingrow.appendChild(emptyCell);
+		gradingrow.appendChild(gradeCell);
 		table.appendChild(gradingrow);
 
 		this.#DOM = table;
+		this.saved = false;
 	}
 
 	get DOM () {
-		if(!this.#DOM) this.#updateDOM();
+		if(!this.#DOM) this.updateDOM();
 		return this.#DOM;
 	}
 
@@ -148,4 +193,54 @@ class Table {
 		}
 		return table;
 	}
+
+	async delete() {
+		const response = await fetch(window.location.origin + "/tabledelete", {
+		method: 'POST',
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		},
+		body: `{
+			"id": "${this.id}"
+ 			}`,
+		});
+	}
+}
+
+Table.load = async function(id, callback) {
+	const response = await fetch(window.location.origin + "/tableread", {
+		method: 'POST',
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		},
+		body: `{
+			"id": "${id}"
+ 			}`,
+	});
+	
+	response.json().then(data => {
+		callback(
+			new Table(data.title, data.author, data.id, data.fields)
+		);
+	});
+}
+
+Table.loadList = async function(callback) {
+	const response = await fetch(window.location.origin + "/tablelist", {
+		method: 'POST',
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		}
+	});
+	
+	response.json().then(data => {
+		let tables = [];
+		for(let json of data) {
+			tables.push(new Table(json.title, json.author, json.id, json.fields));
+		}
+		callback(tables);
+	});
 }
